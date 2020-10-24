@@ -6,7 +6,7 @@ def init_array(n):
     random.SystemRandom()
 
     #initialize array and fill with all zeros
-    array = [[0] * n for i in range(n)]
+    array = [ [ 0 for i in range(n) ] for j in range(n) ]
 
     #range 36 to 52% of the squares in an array should be filled
     squares = random.randint(int(0.36*n*n),int(0.52*n*n))
@@ -29,7 +29,7 @@ def init_array(n):
 def init_guess_array(n):
 
     #initialize array and fill with all zeros
-    guess_array = [[0] * n for i in range(n)]
+    guess_array = [ [ 0 for i in range(n) ] for j in range(n) ]
     print(guess_array)
     return guess_array
 
@@ -51,34 +51,75 @@ def get_row_numbers(array,n):
     #largest group of numbers in a picross game as a function of the puzzle size
     groupNum=math.ceil(n/2)
     #initialize array
-    row_numbers = [[0] * groupNum] * n
-    counti=0
+    row_numbers = [ [ 0 for i in range(groupNum) ] for j in range(n) ]
     j=0
     i=0
+    k=0
     numCount=0
 
-    while j in range(n):
-        while i in range(n):
-            if array[i][j] == 1:
-                numBegin=i
-                k=numBegin
-                while array[k][j] == 1:
-                    if array[k][j] == 0:
-                        numEnd = k
-                        num=numEnd-numBegin
-                        row_numbers[numCount][j] = num
-                        numCount = numCount + 1
-                        i = numEnd
+    while j in range(n): # iterate through rows
+        while i in range(n): # iterate through the columns
+            if array[j][i] == 1:
+                k = i
+                while k in range(n):
+                    if array[j][k] == 0:
+                        numRow = k-i
+                        row_numbers[j][numCount] = numRow
+                        numCount = numCount+1
+                        i = k
                         break
-                    k=k+1
-            else:
-                i=i+1
+                    elif k == n-1:
+                        if k == i:
+                            numRow = 1
+                        else:
+                            numRow = k-i+1
+                        row_numbers[j][numCount] = numRow
+                        numCount = numCount+1
+                        i = k
+                        break
+                    k = k + 1
+            i = i + 1
         j = j + 1
-
-    print(row_numbers)
+        i=0
+        numCount = 0
+    # print(row_numbers)
     return row_numbers
 
+
 def get_columns_numbers(array,n):
+    #largest group of numbers in a picross game as a function of the puzzle size
+    groupNum=math.ceil(n/2)
+    #initialize array
+    column_numbers = [ [ 0 for i in range(groupNum) ] for j in range(n) ]
+    j=0
+    i=0
+    k=0
+    numCount=0
 
-
-    return
+    while i in range(n): # iterate through rows
+        while j in range(n): # iterate through the columns
+            if array[j][i] == 1:
+                k = j
+                while k in range(n):
+                    if array[k][i] == 0:
+                        numCol = k-j
+                        column_numbers[i][numCount] = numCol
+                        numCount = numCount+1
+                        j = k
+                        break
+                    elif k == n-1:
+                        if k == j:
+                            numCol = 1
+                        else:
+                            numCol = k-j+1
+                        column_numbers[i][numCount] = numCol
+                        numCount = numCount+1
+                        j = k
+                        break
+                    k = k + 1
+            j = j + 1
+        i = i + 1
+        j=0
+        numCount = 0
+    print(column_numbers)
+    return column_numbers
