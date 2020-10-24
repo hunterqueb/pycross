@@ -23,28 +23,28 @@ def init_array(n):
             else:
                 continue
 
-    print(array)
+    # print(array)
     return array
 
 def init_guess_array(n):
 
     #initialize array and fill with all zeros
     guess_array = [ [ 0 for i in range(n) ] for j in range(n) ]
-    print(guess_array)
+    # print(guess_array)
     return guess_array
 
 def guess_in_array(array,i,j):
     # changes value in guess array to 1 for a user guessed
     # array is passed by reference
     array[i][j] = 1
-    print(array)
+    # print(array)
     return
 
 def rm_guess_in_array(array,i,j):
     # changes value in guess array from 1 to 0 for a user
     # array passed by reference
     array[i][j] = 0
-    print(array)
+    # print(array)
     return
 
 def get_row_numbers(array,n):
@@ -86,7 +86,7 @@ def get_row_numbers(array,n):
     return row_numbers
 
 
-def get_columns_numbers(array,n):
+def get_column_numbers(array,n):
     #largest group of numbers in a picross game as a function of the puzzle size
     groupNum=math.ceil(n/2)
     #initialize array
@@ -121,5 +121,5 @@ def get_columns_numbers(array,n):
         i = i + 1
         j=0
         numCount = 0
-    print(column_numbers)
+    # print(column_numbers)
     return column_numbers
