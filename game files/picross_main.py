@@ -18,7 +18,7 @@ import math
 from win32api import *
 
 # How Big is the Array?
-SQUAREARRAY = 5
+gameSize = 5
 
 # Define some colors
 BLACK = (0, 0, 0)
@@ -38,19 +38,24 @@ refreshRate = getattr(settings, 'DisplayFrequency')
 
 # This sets the WIDTH and HEIGHT of each grid location along with a fixed margin - consider changing this
 MARGIN = 5
-WIDTH = (WINDOW_SIZE_SIDE - MARGIN * (SQUAREARRAY+2))/(SQUAREARRAY+1)
+WIDTH = (WINDOW_SIZE_SIDE - MARGIN * (gameSize+2))/(gameSize+1)
 HEIGHT = WIDTH
 
 #initialize the grid array used for coloring picross ui
 grid = []
-for row in range(SQUAREARRAY+1):
+for row in range(gameSize+1):
     grid.append([])
-    for column in range(SQUAREARRAY+1):
+    for column in range(gameSize+1):
         grid[row].append(0)  # Append a cell
 
+# pre pygame window calculations
 #initialize arrays for storing game
-array=init_array(SQUAREARRAY)
-guess=init_guess_array(SQUAREARRAY)
+gameArray=init_array(gameSize)
+guessArray=init_guess_array(gameSize)
+
+#initialze the hints for the user
+rowHints = get_row_numbers(gameArray,gameSize)
+columnHints = get_column_numbers(gameArray,gameSize)
 
 # Initialize pygame
 pygame.init()
@@ -65,6 +70,7 @@ done = False
 
 # Used to manage how fast the screen updates
 clock = pygame.time.Clock()
+
 # -------- Main Program Loop -----------
 while not done:
     for event in pygame.event.get():  # User did something
@@ -79,7 +85,7 @@ while not done:
                 row = int((pos[1]-(HEIGHT + MARGIN)) // (HEIGHT + MARGIN))
 
                 # prevent game from crashing if you click outside of array
-                if column > SQUAREARRAY-1 or row > SQUAREARRAY-1:
+                if column > gameSize-1 or row > gameSize-1:
                     break
                 # dont allow clicking in boxes used for numbers
                 if column < 0 or row < 0:
@@ -99,22 +105,22 @@ while not done:
                 # Empty cell and left click
                 if grid[row+1][column+1] == 0 and pygame.mouse.get_pressed()[0] > 0:
                     grid[row+1][column+1] = 1
-                    guess_in_array(guess,row,column)
+                    guess_in_array(guessArray,row,column)
                 # guessed cell and left click
                 elif grid[row+1][column+1] == 1 and pygame.mouse.get_pressed()[0] > 0:
                     grid[row+1][column+1] = 0
-                    rm_guess_in_array(guess,row,column)
+                    rm_guess_in_array(guessArray,row,column)
                 # empty cell and right clicked
                 elif grid[row+1][column+1] == 0 and pygame.mouse.get_pressed()[2] > 0:
                     grid[row+1][column+1] = 2
                 # blocked cell and right clicked
                 elif grid[row+1][column+1] == 2 and pygame.mouse.get_pressed()[2] > 0:
                     grid[row+1][column+1] = 0
-                    rm_guess_in_array(guess,row,column)
+                    rm_guess_in_array(guessArray,row,column)
                 # guessed cell and right clicked
                 elif grid[row+1][column+1] == 1 and pygame.mouse.get_pressed()[2] > 0:
                     grid[row+1][column+1] = 0
-                    rm_guess_in_array(guess,row,column)
+                    rm_guess_in_array(guessArray,row,column)
 
                 # saves the index of the array to prevent to be used above to force guessing in only one direction per mouse click
                 if savedIndex[0] == row:
@@ -140,8 +146,8 @@ while not done:
     screen.fill(DARKGREY)
 
     # Draw the grid
-    for row in range(SQUAREARRAY+1):
-        for column in range(SQUAREARRAY+1):
+    for row in range(gameSize+1):
+        for column in range(gameSize+1):
             color = WHITE
             #for left click draw green
             if grid[row][column] == 1:
@@ -165,7 +171,12 @@ pygame.quit()
 
 # NOTES
 
-if array==guess:
+# 1 screen with to choose size
+# 1 screen that will be used to play the game
+# 1 screen that shows you win and replay the game
+
+if gameArray==guessArray:
     #draw a win condition
     print('You Win!!!!!!')
+    # draw something that will change the screen
     #click to restart?
