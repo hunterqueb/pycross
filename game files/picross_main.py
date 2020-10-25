@@ -19,6 +19,7 @@ from win32api import *
 
 # How Big is the Array?
 gameSize = 5
+groupNum=math.ceil(gameSize/2)
 
 # Define some colors
 BLACK = (0, 0, 0)
@@ -38,14 +39,14 @@ refreshRate = getattr(settings, 'DisplayFrequency')
 
 # This sets the WIDTH and HEIGHT of each grid location along with a fixed margin - consider changing this
 MARGIN = 5
-WIDTH = (WINDOW_SIZE_SIDE - MARGIN * (gameSize+2))/(gameSize+1)
+WIDTH = (WINDOW_SIZE_SIDE - MARGIN * (gameSize+2*groupNum))/(gameSize+1*groupNum)
 HEIGHT = WIDTH
 
 #initialize the grid array used for coloring picross ui
 grid = []
-for row in range(gameSize+1):
+for row in range(gameSize+groupNum):
     grid.append([])
-    for column in range(gameSize+1):
+    for column in range(gameSize+groupNum):
         grid[row].append(0)  # Append a cell
 
 # pre pygame window calculations
@@ -64,6 +65,10 @@ screen = pygame.display.set_mode(WINDOW_SIZE)
 
 # Set title of screen
 pygame.display.set_caption("Picross")
+# text = font.render('GeeksForGeeks', True, BLACK, WHITE)
+
+
+
 
 # Loop until the user clicks the close button.
 done = False
@@ -81,14 +86,13 @@ while not done:
                 # User clicks the mouse. Get the position
                 pos = pygame.mouse.get_pos()
                 # Change the x/y screen coordinates to grid coordinates
-                column = int((pos[0]-(WIDTH + MARGIN)) // (WIDTH + MARGIN))
-                row = int((pos[1]-(HEIGHT + MARGIN)) // (HEIGHT + MARGIN))
-
+                column = int((pos[0]-(WIDTH + MARGIN)) // (WIDTH + MARGIN)) + 1
+                row = int((pos[1]-(HEIGHT + MARGIN)) // (HEIGHT + MARGIN)) + 1
                 # prevent game from crashing if you click outside of array
-                if column > gameSize-1 or row > gameSize-1:
+                if column > gameSize+groupNum-1 or row > gameSize+groupNum-1:
                     break
                 # dont allow clicking in boxes used for numbers
-                if column < 0 or row < 0:
+                if column < groupNum or row < groupNum:
                     break
 
                 # checks to see if what previous direction the player was moving and fixes all guessing to that direction
@@ -98,29 +102,28 @@ while not done:
                     column = savedIndex[1]
 
                 # prevents rapid guessing as mouse movements are updated
-                if lastArrayAccess == [row,column]:
+                if [row,column] == lastArrayAccess:
                     break
 
             # Toggle location and set state depending on mouse click
                 # Empty cell and left click
-                if grid[row+1][column+1] == 0 and pygame.mouse.get_pressed()[0] > 0:
-                    grid[row+1][column+1] = 1
-                    guess_in_array(guessArray,row,column)
+                if grid[row-groupNum][column-groupNum] == 0 and pygame.mouse.get_pressed()[0] > 0:
+                    grid[row-groupNum][column-groupNum] = 1
+                    guess_in_array(guessArray,row-groupNum,column-groupNum)
                 # guessed cell and left click
-                elif grid[row+1][column+1] == 1 and pygame.mouse.get_pressed()[0] > 0:
-                    grid[row+1][column+1] = 0
-                    rm_guess_in_array(guessArray,row,column)
+                elif grid[row-groupNum][column-groupNum] == 1 and pygame.mouse.get_pressed()[0] > 0:
+                    grid[row-groupNum][column-groupNum] = 0
+                    rm_guess_in_array(guessArray,row-groupNum,column-groupNum)
                 # empty cell and right clicked
-                elif grid[row+1][column+1] == 0 and pygame.mouse.get_pressed()[2] > 0:
-                    grid[row+1][column+1] = 2
+                elif grid[row-groupNum][column-groupNum] == 0 and pygame.mouse.get_pressed()[2] > 0:
+                    grid[row-groupNum][column-groupNum] = 2
                 # blocked cell and right clicked
-                elif grid[row+1][column+1] == 2 and pygame.mouse.get_pressed()[2] > 0:
-                    grid[row+1][column+1] = 0
-                    rm_guess_in_array(guessArray,row,column)
+                elif grid[row-groupNum][column-groupNum] == 2 and pygame.mouse.get_pressed()[2] > 0:
+                    grid[row-groupNum][column-groupNum] = 0
                 # guessed cell and right clicked
-                elif grid[row+1][column+1] == 1 and pygame.mouse.get_pressed()[2] > 0:
-                    grid[row+1][column+1] = 0
-                    rm_guess_in_array(guessArray,row,column)
+                elif grid[row-groupNum][column-groupNum] == 1 and pygame.mouse.get_pressed()[2] > 0:
+                    grid[row-groupNum][column-groupNum] = 0
+                    rm_guess_in_array(guessArray,row-groupNum,column-groupNum)
 
                 # saves the index of the array to prevent to be used above to force guessing in only one direction per mouse click
                 if savedIndex[0] == row:
@@ -146,17 +149,18 @@ while not done:
     screen.fill(DARKGREY)
 
     # Draw the grid
-    for row in range(gameSize+1):
-        for column in range(gameSize+1):
+    for row in range(gameSize+groupNum):
+        for column in range(gameSize+groupNum):
             color = WHITE
             #for left click draw green
-            if grid[row][column] == 1:
+            if grid[row-groupNum][column-groupNum] == 1:
                 color = GREEN
             #for right click draw red
-            elif grid[row][column] == 2:
+            elif grid[row-groupNum][column-groupNum] == 2:
                 color = RED
             #draw rectangles on screen
             pygame.draw.rect(screen, color, [(MARGIN + WIDTH) * column + MARGIN, (MARGIN + HEIGHT) * row + MARGIN, WIDTH, HEIGHT])
+
 
     # Turn on VSYNC
     clock.tick(refreshRate)
