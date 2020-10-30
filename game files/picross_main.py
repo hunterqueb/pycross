@@ -17,6 +17,15 @@ import math
 # import win32api for display settings
 from win32api import *
 
+def message_display(used_font, size, color,xy,message):
+    font_object = pygame.font.Font(used_font, size)
+    rendered_text = font_object.render(message, True, (color))
+    screenGame.blit(rendered_text,(xy))
+
+def search_font(name):
+    found_font = pygame.font.match_font(name)
+    return found_font
+
 # How Big is the Array?
 gameSize = 5
 groupNum=math.ceil(gameSize/2)
@@ -27,6 +36,8 @@ WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 DARKGREY = (34, 34, 34)
+
+arial = search_font('arial')
 
 # Get the width of the monitor divide by 2 and set a square window size
 WINDOW_SIZE_SIDE=int(GetSystemMetrics(0)/2)
@@ -55,19 +66,20 @@ gameArray=init_array(gameSize)
 guessArray=init_guess_array(gameSize)
 
 #initialze the hints for the user
+print(gameArray)
 rowHints = get_row_numbers(gameArray,gameSize)
 columnHints = get_column_numbers(gameArray,gameSize)
+print(rowHints)
+print(columnHints)
 
 # Initialize pygame
 pygame.init()
 
-screen = pygame.display.set_mode(WINDOW_SIZE)
+screenGame = pygame.display.set_mode(WINDOW_SIZE)
 
 # Set title of screen
 pygame.display.set_caption("Picross")
 # text = font.render('GeeksForGeeks', True, BLACK, WHITE)
-
-
 
 
 # Loop until the user clicks the close button.
@@ -105,6 +117,8 @@ while not done:
                 if [row,column] == lastArrayAccess:
                     break
 
+                # if lastDir == 'row' or lastDir == 'column':
+                #     break
             # Toggle location and set state depending on mouse click
                 # Empty cell and left click
                 if grid[row-groupNum][column-groupNum] == 0 and pygame.mouse.get_pressed()[0] > 0:
@@ -112,25 +126,27 @@ while not done:
                     guess_in_array(guessArray,row-groupNum,column-groupNum)
                 # guessed cell and left click
                 elif grid[row-groupNum][column-groupNum] == 1 and pygame.mouse.get_pressed()[0] > 0:
+                    #prevent user from doubling back on there guess choice if held down
                     grid[row-groupNum][column-groupNum] = 0
                     rm_guess_in_array(guessArray,row-groupNum,column-groupNum)
                 # empty cell and right clicked
                 elif grid[row-groupNum][column-groupNum] == 0 and pygame.mouse.get_pressed()[2] > 0:
+
                     grid[row-groupNum][column-groupNum] = 2
+
                 # blocked cell and right clicked
                 elif grid[row-groupNum][column-groupNum] == 2 and pygame.mouse.get_pressed()[2] > 0:
-                    grid[row-groupNum][column-groupNum] = 0
-                # guessed cell and right clicked
-                elif grid[row-groupNum][column-groupNum] == 1 and pygame.mouse.get_pressed()[2] > 0:
+                    #prevent user from doubling back on there remove choice if held down
                     grid[row-groupNum][column-groupNum] = 0
                     rm_guess_in_array(guessArray,row-groupNum,column-groupNum)
 
-                # saves the index of the array to prevent to be used above to force guessing in only one direction per mouse click
+
+                # saves the index of the array to be used above to force guessing in only one direction per mouse click
                 if savedIndex[0] == row:
                     lastDir = 'row'
                 elif savedIndex[1] == column:
                     lastDir = 'column'
-                else: # in the even that that it is your first movement, save the index
+                else: # in the event that that it is your first movement, save the index
                     savedIndex=[row,column]
 
                 # prevents messed up behavior when holding down Lclick
@@ -146,7 +162,7 @@ while not done:
             lastDir = None
             savedIndex=[None,None]
     # Set the screen background
-    screen.fill(DARKGREY)
+    screenGame.fill(DARKGREY)
 
     # Draw the grid
     for row in range(gameSize+groupNum):
@@ -158,14 +174,20 @@ while not done:
             #for right click draw red
             elif grid[row-groupNum][column-groupNum] == 2:
                 color = RED
+            # dont draw the squares in the upper right corner that goes unused
+            if row < groupNum and column < groupNum:
+                continue
             #draw rectangles on screen
-            pygame.draw.rect(screen, color, [(MARGIN + WIDTH) * column + MARGIN, (MARGIN + HEIGHT) * row + MARGIN, WIDTH, HEIGHT])
+            pygame.draw.rect(screenGame, color, [(MARGIN + WIDTH) * column + MARGIN, (MARGIN + HEIGHT) * row + MARGIN, WIDTH, HEIGHT])
 
+            message_display(arial,int(HEIGHT),BLACK,((MARGIN + WIDTH) * column + MARGIN,(MARGIN + HEIGHT) * row),str(1))
+    # for row in range(gameSize+groupNum):
+    #     for column in range(gameSize+groupNum):
 
     # Turn on VSYNC
     clock.tick(refreshRate)
 
-    # update the screen
+    # update the screenGame
     pygame.display.flip()
 
 
