@@ -12,8 +12,8 @@ from picross_functions import *
 
 #import pygame for WINDOW
 import pygame
-import random
 import math
+import time
 # import win32api for display settings
 from win32api import *
 
@@ -25,6 +25,10 @@ def message_display(used_font, size, color,xy,message):
 def search_font(name):
     found_font = pygame.font.match_font(name)
     return found_font
+
+
+# MAIN GAME LOGIC
+
 
 # How Big is the Array?
 gameSize = 5
@@ -69,21 +73,25 @@ guessArray=init_guess_array(gameSize)
 print(gameArray)
 rowHints = get_row_numbers(gameArray,gameSize)
 columnHints = get_column_numbers(gameArray,gameSize)
+
 print(rowHints)
 print(columnHints)
+
+transposedColumnHints = []
+transposedColumnHints = transpose(columnHints, transposedColumnHints)
+
 
 # Initialize pygame
 pygame.init()
 
-screenGame = pygame.display.set_mode(WINDOW_SIZE)
+screenGame = pygame.display.set_mode(WINDOW_SIZE, pygame.RESIZABLE)
 
 # Set title of screen
 pygame.display.set_caption("Picross")
-# text = font.render('GeeksForGeeks', True, BLACK, WHITE)
-
 
 # Loop until the user clicks the close button.
 done = False
+winCondtion = 0
 
 # Used to manage how fast the screen updates
 clock = pygame.time.Clock()
@@ -91,6 +99,8 @@ clock = pygame.time.Clock()
 # -------- Main Program Loop -----------
 while not done:
     for event in pygame.event.get():  # User did something
+        if event.type == pygame.VIDEORESIZE:
+            screenGame = pygame.display.set_mode((event.w, event.h),pygame.RESIZABLE)
         if event.type == pygame.QUIT:  # If user clicked close
             done = True  # Flag that we are done so we exit this loop
         elif pygame.mouse.get_pressed()[0] or pygame.mouse.get_pressed()[2]:
@@ -165,6 +175,7 @@ while not done:
     screenGame.fill(DARKGREY)
 
     # Draw the grid
+
     for row in range(gameSize+groupNum):
         for column in range(gameSize+groupNum):
             color = WHITE
@@ -179,17 +190,41 @@ while not done:
                 continue
             #draw rectangles on screen
             pygame.draw.rect(screenGame, color, [(MARGIN + WIDTH) * column + MARGIN, (MARGIN + HEIGHT) * row + MARGIN, WIDTH, HEIGHT])
-
-            message_display(arial,int(HEIGHT),BLACK,((MARGIN + WIDTH) * column + MARGIN,(MARGIN + HEIGHT) * row),str(1))
-    # for row in range(gameSize+groupNum):
-    #     for column in range(gameSize+groupNum):
+            
+            # draw the row hints
+            if column < groupNum:
+                message_display(arial,int(HEIGHT),BLACK,((WIDTH/2)+(MARGIN + WIDTH) * column + MARGIN,(MARGIN + HEIGHT) * row),str(rowHints[row-groupNum][column]))
+            else:
+                pass
+            
+    # draw the column hints
+    for column in range(gameSize+groupNum):
+        for row in range(gameSize+groupNum):
+            if column >= groupNum and row < groupNum:
+                message_display(arial,int(HEIGHT),BLACK,((WIDTH/2)+(MARGIN + WIDTH) * column + MARGIN,(MARGIN + HEIGHT) * row),str(transposedColumnHints[row][column-groupNum]))
+            else:
+                pass
 
     # Turn on VSYNC
     clock.tick(refreshRate)
 
+    if gameArray == guessArray:
+        done = True
+        winCondtion = 1
     # update the screenGame
     pygame.display.flip()
-
+    
+#draw a win condition
+if winCondtion == 0:
+    screenGame.fill(DARKGREY)
+    winFontSize = 200
+    otherFont = 100
+    arial = search_font('arial')
+    message_display(arial, winFontSize, WHITE, (WINDOW_SIZE_SIDE-850, WINDOW_SIZE_SIDE-650), "YOU WIN")
+    message_display(arial, otherFont, WHITE, (WINDOW_SIZE_SIDE-850+50, WINDOW_SIZE_SIDE-650+winFontSize), "Closing in 5 sec...")
+    pygame.display.flip()
+    time.sleep(5)
+    #click to restart?
 
 pygame.quit()
 
@@ -200,9 +235,3 @@ pygame.quit()
 # 1 screen with to choose size
 # 1 screen that will be used to play the game
 # 1 screen that shows you win and replay the game
-
-if gameArray==guessArray:
-    #draw a win condition
-    print('You Win!!!!!!')
-    # draw something that will change the screen
-    #click to restart?
