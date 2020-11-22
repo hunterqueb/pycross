@@ -17,6 +17,8 @@ Picross, nonograms, griddlers, pic-a-pix.... is a logic picture puzzle that reli
 
 Picross is usually played with boards that create the silhouette of objects or things. As well, boards can become quite large and complex.
 
+Fun fact -- solving nonogram puzzles is an NP-complete problem!
+
 ## How do you Play Picross?
 A great online source to learn how to play can be found here: https://puzzlygame.com/pages/how_to_play_nonograms/
 
