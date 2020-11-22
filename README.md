@@ -13,7 +13,7 @@ I have yet to test this on any other machine other than my Windows 10 computer u
 Picross, nonograms, griddlers, pic-a-pix.... is a logic picture puzzle that relies on filling in a grid of squares using hints to help the player understand where groups of blocks lie in the grid.
 
 ![Picross Example](https://coolbutuseless.github.io/img/nonogram/example-solved.png)
-[Picture Source](https://coolbutuseless.github.io)
+[Picture Source](https://coolbutuseless.github.io/2018/09/28/writing-a-nonogram-solver-in-r/)
 
 Picross is usually played with boards that create the silhouette of objects or things. As well, boards can become quite large and complex.
 
