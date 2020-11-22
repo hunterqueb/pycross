@@ -123,3 +123,16 @@ def get_column_numbers(array,n):
         numCount = 0
     # print(column_numbers)
     return column_numbers
+
+def transpose(l1, l2):
+    # for use in transposing the column hint array to easily display on screen the hints
+    # iterate over list l1 to the length of an item
+    for i in range(len(l1[0])):
+        # print(i)
+        row = []
+        for item in l1:
+            # appending to new list with values and index positions
+            # i contains index position and item contains values
+            row.append(item[i])
+        l2.append(row)
+    return l2
