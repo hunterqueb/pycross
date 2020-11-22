@@ -215,7 +215,7 @@ while not done:
     pygame.display.flip()
     
 #draw a win condition
-if winCondtion == 0:
+if winCondtion == 1:
     screenGame.fill(DARKGREY)
     winFontSize = 200
     otherFont = 100
