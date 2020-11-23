@@ -7,24 +7,18 @@
 #           autostrike-out row after fully populating row
 #
 
-#custom functions
-from picross_functions import *
 
 #import pygame for WINDOW
-import pygame
 import math
 import time
+import pygame
+
+
+#custom functions
+import picross_functions
+import colors
 # import win32api for display settings
-from win32api import *
-
-def message_display(used_font, size, color,xy,message):
-    font_object = pygame.font.Font(used_font, size)
-    rendered_text = font_object.render(message, True, (color))
-    screenGame.blit(rendered_text,(xy))
-
-def search_font(name):
-    found_font = pygame.font.match_font(name)
-    return found_font
+import win32api
 
 
 # MAIN GAME LOGIC
@@ -32,24 +26,18 @@ def search_font(name):
 
 # How Big is the Array?
 gameSize = 5
-groupNum=math.ceil(gameSize/2)
+groupNum = math.ceil(gameSize/2)
 
-# Define some colors
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-GREEN = (0, 255, 0)
-RED = (255, 0, 0)
-DARKGREY = (34, 34, 34)
 
-arial = search_font('arial')
+arial = picross_functions.search_font('arial')
 
 # Get the width of the monitor divide by 2 and set a square window size
-WINDOW_SIZE_SIDE=int(GetSystemMetrics(0)/2)
+WINDOW_SIZE_SIDE = int(win32api.GetSystemMetrics(0)/2)
 WINDOW_SIZE = [WINDOW_SIZE_SIDE, WINDOW_SIZE_SIDE]
 
 # get the display device used and get the refreshRate
-device = EnumDisplayDevices()
-settings = EnumDisplaySettings(device.DeviceName, -1)
+device = win32api.EnumDisplayDevices()
+settings = win32api.EnumDisplaySettings(device.DeviceName, -1)
 refreshRate = getattr(settings, 'DisplayFrequency')
 
 # This sets the WIDTH and HEIGHT of each grid location along with a fixed margin - consider changing this
@@ -66,19 +54,20 @@ for row in range(gameSize+groupNum):
 
 # pre pygame window calculations
 #initialize arrays for storing game
-gameArray=init_array(gameSize)
-guessArray=init_guess_array(gameSize)
+gameArray = picross_functions.init_true_rand_array(gameSize)
+guessArray = picross_functions.init_guess_array(gameSize)
 
 #initialze the hints for the user
 print(gameArray)
-rowHints = get_row_numbers(gameArray,gameSize)
-columnHints = get_column_numbers(gameArray,gameSize)
+rowHints = picross_functions.get_row_numbers(gameArray, gameSize)
+columnHints = picross_functions.get_column_numbers(gameArray,gameSize)
 
 print(rowHints)
 print(columnHints)
 
 transposedColumnHints = []
-transposedColumnHints = transpose(columnHints, transposedColumnHints)
+transposedColumnHints = picross_functions.transpose(
+    columnHints, transposedColumnHints)
 
 
 # Initialize pygame
@@ -133,12 +122,12 @@ while not done:
                 # Empty cell and left click
                 if grid[row-groupNum][column-groupNum] == 0 and pygame.mouse.get_pressed()[0] > 0:
                     grid[row-groupNum][column-groupNum] = 1
-                    guess_in_array(guessArray,row-groupNum,column-groupNum)
+                    picross_functions.guess_in_array(guessArray,row-groupNum,column-groupNum)
                 # guessed cell and left click
                 elif grid[row-groupNum][column-groupNum] == 1 and pygame.mouse.get_pressed()[0] > 0:
                     #prevent user from doubling back on there guess choice if held down
                     grid[row-groupNum][column-groupNum] = 0
-                    rm_guess_in_array(guessArray,row-groupNum,column-groupNum)
+                    picross_functions.rm_guess_in_array(guessArray,row-groupNum,column-groupNum)
                 # empty cell and right clicked
                 elif grid[row-groupNum][column-groupNum] == 0 and pygame.mouse.get_pressed()[2] > 0:
 
@@ -148,7 +137,7 @@ while not done:
                 elif grid[row-groupNum][column-groupNum] == 2 and pygame.mouse.get_pressed()[2] > 0:
                     #prevent user from doubling back on there remove choice if held down
                     grid[row-groupNum][column-groupNum] = 0
-                    rm_guess_in_array(guessArray,row-groupNum,column-groupNum)
+                    picross_functions.rm_guess_in_array(guessArray,row-groupNum,column-groupNum)
 
 
                 # saves the index of the array to be used above to force guessing in only one direction per mouse click
@@ -172,19 +161,19 @@ while not done:
             lastDir = None
             savedIndex=[None,None]
     # Set the screen background
-    screenGame.fill(DARKGREY)
+    screenGame.fill(colors.DARKGREY)
 
     # Draw the grid
 
     for row in range(gameSize+groupNum):
         for column in range(gameSize+groupNum):
-            color = WHITE
+            color = colors.WHITE
             #for left click draw green
             if grid[row-groupNum][column-groupNum] == 1:
-                color = GREEN
+                color = colors.GREEN
             #for right click draw red
             elif grid[row-groupNum][column-groupNum] == 2:
-                color = RED
+                color = colors.RED
             # dont draw the squares in the upper right corner that goes unused
             if row < groupNum and column < groupNum:
                 continue
@@ -193,7 +182,7 @@ while not done:
             
             # draw the row hints
             if column < groupNum:
-                message_display(arial,int(HEIGHT),BLACK,((WIDTH/2)+(MARGIN + WIDTH) * column + MARGIN,(MARGIN + HEIGHT) * row),str(rowHints[row-groupNum][column]))
+                picross_functions.message_display(arial, int(HEIGHT), colors.BLACK, ((WIDTH/2)+(MARGIN + WIDTH) * column + MARGIN, (MARGIN + HEIGHT) * row), str(rowHints[row-groupNum][column]), screenGame)
             else:
                 pass
             
@@ -201,7 +190,7 @@ while not done:
     for column in range(gameSize+groupNum):
         for row in range(gameSize+groupNum):
             if column >= groupNum and row < groupNum:
-                message_display(arial,int(HEIGHT),BLACK,((WIDTH/2)+(MARGIN + WIDTH) * column + MARGIN,(MARGIN + HEIGHT) * row),str(transposedColumnHints[row][column-groupNum]))
+                picross_functions.message_display(arial,int(HEIGHT),colors.BLACK,((WIDTH/2)+(MARGIN + WIDTH) * column + MARGIN,(MARGIN + HEIGHT) * row),str(transposedColumnHints[row][column-groupNum]),screenGame)
             else:
                 pass
 
@@ -216,12 +205,12 @@ while not done:
     
 #draw a win condition
 if winCondtion == 1:
-    screenGame.fill(DARKGREY)
+    screenGame.fill(colors.DARKGREY)
     winFontSize = 200
     otherFont = 100
-    arial = search_font('arial')
-    message_display(arial, winFontSize, WHITE, (WINDOW_SIZE_SIDE-850, WINDOW_SIZE_SIDE-650), "YOU WIN")
-    message_display(arial, otherFont, WHITE, (WINDOW_SIZE_SIDE-850+50, WINDOW_SIZE_SIDE-650+winFontSize), "Closing in 5 sec...")
+    arial = picross_functions.search_font('arial')
+    picross_functions.message_display(arial, winFontSize, colors.WHITE, (WINDOW_SIZE_SIDE-850, WINDOW_SIZE_SIDE-650), "YOU WIN",screenGame)
+    picross_functions.message_display(arial, otherFont, colors.WHITE, (WINDOW_SIZE_SIDE-850+50, WINDOW_SIZE_SIDE-650+winFontSize), "Closing in 5 sec...",screenGame)
     pygame.display.flip()
     time.sleep(5)
     #click to restart?
