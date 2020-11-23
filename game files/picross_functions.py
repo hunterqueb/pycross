@@ -1,25 +1,45 @@
 import random
 import math
+import pygame
 
-def init_array(n):
+
+def init_rand_array(n):
     #seed random generation
     random.SystemRandom()
 
     #initialize array and fill with all zeros
-    array = [ [ 0 for i in range(n) ] for j in range(n) ]
+    array = [[0 for i in range(n)] for j in range(n)]
 
     #range 36 to 52% of the squares in an array should be filled
-    squares = random.randint(int(0.36*n*n),int(0.52*n*n))
+    squares = random.randint(int(0.36*n*n), int(0.52*n*n))
 
     fillCount = 0
     for i in range(n):
         for j in range(n):
-            fill = random.randint(0,1)
+            fill = random.randint(0, 1)
             if fillCount == squares:
                 break
             if fill == 1:
                 array[i][j] = 1
                 fillCount += 1
+            else:
+                continue
+
+    # print(array)
+    return array
+
+def init_true_rand_array(n):
+    #seed random generation
+    random.SystemRandom()
+
+    #initialize array and fill with all zeros
+    array = [[0 for i in range(n)] for j in range(n)]
+
+    for i in range(n):
+        for j in range(n):
+            fill = random.randint(0, 1)
+            if fill == 1:
+                array[i][j] = 1
             else:
                 continue
 
@@ -136,3 +156,14 @@ def transpose(l1, l2):
             row.append(item[i])
         l2.append(row)
     return l2
+
+
+def message_display(used_font, size, color, xy, message, screenGame):
+    font_object = pygame.font.Font(used_font, size)
+    rendered_text = font_object.render(message, True, (color))
+    screenGame.blit(rendered_text, (xy))
+
+
+def search_font(name):
+    found_font = pygame.font.match_font(name)
+    return found_font
